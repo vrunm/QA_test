@@ -10,11 +10,11 @@ import openai
 
 # connect to pinecone environment
 pinecone.init(
-    api_key="f05e7424-81f2-4206-ade7-2d25830e488b",
+    api_key="d4f20339-fcc1-4a11-b04f-3800203eacd2",
     environment="us-east1-gcp"  
 )
 
-index_name = "week1-streamlit-qa"
+index_name = "abstractive-question-answering"
 
 index = pinecone.Index(index_name)
 
