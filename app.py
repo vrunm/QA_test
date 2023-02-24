@@ -1,4 +1,3 @@
-!pip install  datasets pinecone-client sentence-transformers torch tqdm
 import pandas as pd
 from tqdm import tqdm
 import pinecone
