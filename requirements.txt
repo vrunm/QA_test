@@ -3,3 +3,4 @@ pinecone-client
 sentence-transformers
 torch
 tqdm
+openai
