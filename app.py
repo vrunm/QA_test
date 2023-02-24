@@ -50,7 +50,7 @@ def query_pinecone(query, top_k, model):
 
 def format_query(query_results):
     # extract passage_text from Pinecone search result
-    context = [result['metadata']['Text'] for result in query_results['matches']]
+    context = [result['metadata']['merged_text'] for result in query_results['matches']]
     return context
 
 def gpt3_summary(text):
