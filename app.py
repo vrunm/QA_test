@@ -59,9 +59,9 @@ def save_key(api_key):
     return api_key
 
 
-def query_pinecone(query, top_k, score_threshold=0.5):
+def query_pinecone(query, model, index, top_k, score_threshold=0.5):
     # generate embeddings for the query
-    xq = retriever.encode([query]).tolist()
+    xq = model.encode([query]).tolist()
     # search pinecone index for context passage with the answer
     xc = index.query(xq, top_k=top_k, include_metadata=True)
     # filter the context passages based on the score threshold
