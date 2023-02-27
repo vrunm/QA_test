@@ -1,6 +1,1 @@
-datasets
-pinecone-client
-sentence-transformers
-torch
-tqdm
-openai
+pandas
