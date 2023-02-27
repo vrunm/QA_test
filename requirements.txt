@@ -1,1 +1,8 @@
 pandas
+tqdm
+pinecone-client
+torch
+git+https://github.com/UKPLab/sentence-transformers.git
+transformers
+streamlit
+openai
