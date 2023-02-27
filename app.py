@@ -169,7 +169,7 @@ elif encoder_model == "SGPT":
     retriever_model = get_sgpt_embedding_model()
 
 
-query_results = query_pinecone(query_text, retriever_model, num_results, pinecone_index,score_threshold)
+query_results = query_pinecone(query_text, retriever_model, num_results, pinecone_index)
 
 window = int(st.number_input("Sentence Window Size", 1, 3, value=1))
 
