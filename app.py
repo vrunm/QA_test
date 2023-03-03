@@ -59,17 +59,17 @@ def save_key(api_key):
     return api_key
 
 
-def query_pinecone(query, model, index, top_k, score_threshold=0.5):
+def query_pinecone(query, top_k, model, index, threshold=0.5):
     # generate embeddings for the query
     xq = model.encode([query]).tolist()
     # search pinecone index for context passage with the answer
     xc = index.query(xq, top_k=top_k, include_metadata=True)
     # filter the context passages based on the score threshold
     filtered_matches = []
-    for match in xc['matches']:
-        if match['score'] >= score_threshold:
+    for match in xc["matches"]:
+        if match["score"] >= threshold:
             filtered_matches.append(match)
-    xc['matches'] = filtered_matches
+    xc["matches"] = filtered_matches
     return xc
 
 
@@ -129,23 +129,25 @@ def gpt3_qa(query, answer):
     return response.choices[0].text
 
 
-st.title("Abstractive Question Answering - APPL")
+st.title("Abstractive Question Answering")
+
+st.write("The app uses the quarterly earnings call transcripts for 10 companies (Apple, AMD, Amazon, Cisco, Google, Microsoft, Nvidia, ASML, Intel, Micron) for the years 2016 to 2020.")
 
 query_text = st.text_input("Input Query", value="Who is the CEO of Apple?")
 
-num_results = int(st.number_input("Number of Results to query", 1, 5, value=2))
+num_results = int(st.number_input("Number of Results to query", 1, 5, value=3))
 
 
 # Choose encoder model
 
-encoder_models_choice = ["MPNET", "SGPT"]
+encoder_models_choice = ["SGPT", "MPNET"]
 
 encoder_model = st.selectbox("Select Encoder Model", encoder_models_choice)
 
 
 # Choose decoder model
 
-decoder_models_choice = ["GPT3 (QA_davinci)", "GPT3 (text_davinci)", "T5", "FLAN-T5"]
+decoder_models_choice = ["GPT3 (QA_davinci)", "GPT3 (summary_davinci)", "T5", "FLAN-T5"]
 
 decoder_model = st.selectbox("Select Decoder Model", decoder_models_choice)
 
@@ -169,23 +171,33 @@ elif encoder_model == "SGPT":
     retriever_model = get_sgpt_embedding_model()
 
 
-query_results = query_pinecone(query_text, retriever_model, num_results, pinecone_index)
+window = int(st.number_input("Sentence Window Size", 0, 3, value=0))
 
-window = int(st.number_input("Sentence Window Size", 1, 3, value=1))
+threshold = float(
+    st.number_input(
+        label="Similarity Score Threshold", step=0.05, format="%.2f", value=0.55
+    )
+)
 
 data = get_data()
 
-# context_list = format_query(query_results)
-context_list = sentence_id_combine(data, query_results, lag=window)
+query_results = query_pinecone(
+    query_text, num_results, retriever_model, pinecone_index, threshold
+)
+
+if threshold <= 0.60:
+    context_list = sentence_id_combine(data, query_results, lag=window)
+else:
+    context_list = format_query(query_results)
 
 
 st.subheader("Answer:")
 
 
-if decoder_model == "GPT3 (text_davinci)":
+if decoder_model == "GPT3 (summary_davinci)":
     openai_key = st.text_input(
         "Enter OpenAI key",
-        value="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",
+        value="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",
         type="password",
     )
     api_key = save_key(openai_key)
@@ -199,7 +211,7 @@ if decoder_model == "GPT3 (text_davinci)":
 elif decoder_model == "GPT3 (QA_davinci)":
     openai_key = st.text_input(
         "Enter OpenAI key",
-        value="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",
+        value="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",
         type="password",
     )
     api_key = save_key(openai_key)
